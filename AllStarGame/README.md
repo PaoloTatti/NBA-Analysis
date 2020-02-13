@@ -1,0 +1,7 @@
+# All-Star Game
+
+
+This folder contains the analysis made on the NBA All-Star Game
+
+**Notebooks**:
+* EDA - All Star Game
