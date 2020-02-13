@@ -6,10 +6,7 @@
 
 
 import os
-os.listdir('input')
-
-
-
+os.listdir('Data')
 
 import pandas as pd
 import numpy as np
@@ -32,10 +29,7 @@ init_notebook_mode(connected=True)
 pd.set_option('display.max_columns', 100)
 pd.set_option('display.max_rows', 100)
 
-
 # Some functions used to import the data and to apply simple transformation to them
-
-
 
 def get_data(path):
     df = pd.read_csv(path)
@@ -58,16 +52,9 @@ def change_team(df):
     
     return df
 
-
-
-
 df = get_data('../Data/NBA All Stars 2000-2016 - Sheet1.csv')
 
-
-
-
 df.head(10)
-
 
 # ### Data Cleaning
 
@@ -78,8 +65,6 @@ df.head(10)
 # * Moodify the **Pos** column in order to use the same Position for each year.
 # * Modify the **Nationality** column in order not to have mixed cases (I have decided to divide into United States and Rest Of World)
 # * Modify the **Team** column in order to have the 30 team that are existing now in the NBA. (Please don't feel it personal if your favourite team will not be in analysis, I am a fan of the Seattle SuperSonics, it's hard to do it even for me )
-
-
 
 df['Round'] = df['NBADraft'].str.split(' ').apply(lambda x: x[2])
 df['Pick'] = df['NBADraft'].str.split(' ').apply(lambda x: x[-1])
@@ -99,28 +84,15 @@ df = change_team(df)
 df['Conference'] = np.where(df.SelectionType.str.startswith("Eastern"),"East","West")
 df['Conference'] = np.where(df.Team.str.startswith("New Orleans"),"West",df.Conference)
 
-
 # So now we can take a look at the dataset used in the following analysis.
 
-
-
 df.head(10)
-
-
-
-
 df.isnull().sum()
-
-
-
 
 df.info()
 
 
 # ## Teams Analysis
-
-
-
 
 teams_count = pd.DataFrame(df.groupby('Team').size()).reset_index()
 teams_count.columns = ['Team','Count']
@@ -164,9 +136,6 @@ fig.show()
 # Not suprising is to see some teams with very low partecipation overall, just like *Milwaukee Bucks*, *Memphis Grizzles* and *Charlotte Hornets*.
 
 # In the next plot you will see the number of partecipation per *Year* for each *Team*, divided by *Conference*.
-
-
-
 
 df_TY = pd.DataFrame(df.groupby(['Year','Team']).size()).reset_index()
 df_TY.columns = ['Year','Team','Count']
@@ -260,14 +229,10 @@ iplot(fig)
 
 # Let's take a look at the position and let's check if they changed over the years.
 
-
-
-
 df_Pos = pd.DataFrame(df.groupby('Pos').size()).reset_index()
 df_Pos.columns = ['Pos','Count']
 df_Pos_Year = pd.DataFrame(df.groupby(['Year','Pos']).size()).reset_index()
 df_Pos_Year.columns = ['Year','Pos','Count']
-
 
 def color_selection(pos):
     if pos == 'G':
@@ -401,21 +366,9 @@ fig.show()
 
 # First I want to focus on the draft Pick, hoping to see some if this is relevant to the All-Start Status of a Player.
 
-
-
-
 df.head()
 
-
-
-
-
 df.Round.value_counts()
-
-
-
-
-
 df['Round'] = df.Round.astype('str')
 
 
@@ -494,19 +447,12 @@ fig.show()
 # 
 # Let's see who were the player that went **Undrafted** but still made the **All-Star Game**.
 
-
-
-
 df.drop_duplicates('Player').loc[df['Round'] == 'Undrafted']
-
-
-
-
 
 df.loc[df['Round'] == 'Undrafted'].groupby('Player').size()
 
 
-tingly enough, the only $2$ player to be selected as *Undrafted* were **Ben Wallace** and **Brad Miller** and they were selected more than once.
+# Interestingly enough, the only $2$ player to be selected as *Undrafted* were **Ben Wallace** and **Brad Miller** and they were selected more than once.
 
 # Now let's take a look into the **Pick** of each partecipant. In order to make the *Pick* useful, I multiply the value for the round, in order to have a fair distribution ($1^{st}$ pick of first and second round are very different). 
 # 
@@ -536,10 +482,6 @@ condlist = [(df.RealPick.values<=5),
             (df.RealPick.values>45)]
 choicelist = ['1-5','6-10','11-20','21-30','31-45','45-60']
 df['PickGroup'] = np.select(condlist, choicelist)
-
-
-
-
 
 df['Round'] = df.Round.astype('str')
 
@@ -670,24 +612,11 @@ fig.show()
 # 
 # Let's take a look about how many player were selected for in the first $5$ years of they career.
 
-
-
-
 df.sort_values(by = 'Year', inplace = True)
 df_s = df.drop_duplicates('Player',keep='first')
 df_s['GapASG'] = np.subtract(df_s['Year'],df_s['DraftYear'])
 
-
-
-
-
 df_s.head(10)
-
-
-
-
-
-import numpy as np
 
 gap_east = df_s.loc[df_s['Conference'] == "East"].GapASG
 gap_west = df_s.loc[df_s['Conference'] == "West"].GapASG
@@ -725,11 +654,7 @@ fig.show()
 # 
 # Let's start with the latent one.
 
-
-
-
 df_s.loc[df_s['GapASG'] >= 10].sort_values(by = 'GapASG')
-
 
 # By looking at them, most are not at their first experience (looking at the name it is pretty obvious), but only at the first of the time period considered. From the group above, only *Vlade Divac*, *Sam Cassel*, *Tyson Chandler*, *Kyle Korver* and *Anthony Mason* have actually their first experience at the All-Star Game.
 
@@ -737,13 +662,7 @@ df_s.loc[df_s['GapASG'] >= 10].sort_values(by = 'GapASG')
 # 
 # Below you can see some plots regarding this analysis.
 
-
-
-
 df_s.loc[df_s['GapASG'] < 3].sort_values(by = 'GapASG')
-
-
-
 
 
 df_1 = pd.DataFrame(df_s.loc[df_s['GapASG'] < 3].groupby('DraftYear').size()).reset_index()
@@ -864,9 +783,6 @@ fig.show()
 # Looking at the last barplot, we can say that more player were first pick during the draft but also that some player were drafted from the $4^{th}$ to the $6^{th}$ seed.
 # 
 # Let's see now which of this player have more appereances, i.e which one mantained this status during the year.
-
-
-
 
 players_first  = df_s.loc[df_s['GapASG'] < 3].Player
 
